@@ -10,15 +10,23 @@ class Api::V1::AppsController < Api::BaseController
 
   def application_options
     {
-      name: app_params[:client_name],
+      name: app_params[:client_name].slice(0, 500),
       redirect_uri: app_params[:redirect_uris],
       scopes: app_scopes_or_default,
-      website: app_params[:website],
+      website: app_website
     }
   end
 
   def app_scopes_or_default
     app_params[:scopes] || Doorkeeper.configuration.default_scopes
+  end
+
+  def app_website
+    if app_params[:website] && app_params[:website].size < 500
+      app_params[:website]
+    else
+      nil
+    end
   end
 
   def app_params
